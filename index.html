@@ -120,6 +120,7 @@
             <div class="hidden lg:flex items-center space-x-7 text-sm font-medium">
                 <a href="#about" class="text-slate-300 hover:text-cyber-cyan transition-colors flex items-center gap-1.5"><i class="fa-solid fa-id-card text-xs"></i> 個人簡介</a>
                 <a href="#events" class="text-slate-300 hover:text-cyber-cyan transition-colors flex items-center gap-1.5"><i class="fa-solid fa-trophy text-xs"></i> VEX 賽事履歷</a>
+                <a href="#pid-tuner" class="text-slate-300 hover:text-cyber-cyan transition-colors flex items-center gap-1.5"><i class="fa-solid fa-sliders text-xs"></i> PID 實時調校 Suite</a>
                 <a href="#strategy-simulator" class="text-slate-300 hover:text-cyber-cyan transition-colors flex items-center gap-1.5"><i class="fa-solid fa-route text-xs"></i> 2D 自主路徑模擬</a>
                 <a href="#skills-code" class="text-slate-300 hover:text-cyber-cyan transition-colors flex items-center gap-1.5"><i class="fa-solid fa-code text-xs"></i> 代碼與結構專長</a>
                 <a href="https://www.instagram.com/bensonozh_1223?rpxt=MTZuZDl2Y29pYjFhag==" target="_blank" class="px-3.5 py-1.5 rounded-lg bg-gradient-to-r from-purple-600/20 to-pink-600/20 text-pink-300 border border-pink-500/40 hover:border-pink-400 hover:text-white transition-all text-xs font-mono flex items-center gap-1.5">
@@ -139,6 +140,7 @@
         <div id="mobile-menu" class="hidden lg:hidden glass-panel border-b border-slate-800 px-4 pt-2 pb-6 space-y-3">
             <a href="#about" class="block py-2 text-slate-300 hover:text-cyber-cyan transition-colors">個人簡介</a>
             <a href="#events" class="block py-2 text-slate-300 hover:text-cyber-cyan transition-colors">VEX 賽事履歷</a>
+            <a href="#pid-tuner" class="block py-2 text-slate-300 hover:text-cyber-cyan transition-colors">PID 實時調校 Suite</a>
             <a href="#strategy-simulator" class="block py-2 text-slate-300 hover:text-cyber-cyan transition-colors">2D 自主路徑模擬</a>
             <a href="#skills-code" class="block py-2 text-slate-300 hover:text-cyber-cyan transition-colors">代碼與結構專長</a>
             <a href="https://www.instagram.com/bensonozh_1223?rpxt=MTZuZDl2Y29pYjFhag==" target="_blank" class="block py-2 text-pink-400 font-mono">
@@ -443,6 +445,163 @@
         </div>
     </section>
 
+    <!-- Interactive PID Parameter Tuning Suite -->
+    <section id="pid-tuner" class="py-16 bg-slate-950/80 border-t border-slate-800 relative">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            
+            <div class="text-center max-w-3xl mx-auto mb-10">
+                <div class="text-cyber-cyan font-mono text-xs uppercase tracking-widest mb-2">// INTERACTIVE PID TUNING LABORATORY</div>
+                <h2 class="text-3xl sm:text-4xl font-bold text-slate-100">4694A 專屬 PID 閉迴路參數動態調校 Suite</h2>
+                <p class="text-slate-400 text-sm mt-3">
+                    即時調整 <span class="text-cyber-cyan font-mono font-bold">Kp</span> (比例)、<span class="text-cyber-purple font-mono font-bold">Ki</span> (積分)、<span class="text-cyber-emerald font-mono font-bold">Kd</span> (微分) 參數，實時觀察 4694A 機器人運動響應圖譜、過衝 (Overshoot) 與穩態誤差，並一鍵匯出 C++ / LemLib 程式碼！
+                </p>
+            </div>
+
+            <!-- Presets Selector -->
+            <div class="flex flex-wrap justify-center gap-3 mb-8">
+                <span class="text-xs font-mono text-slate-400 self-center mr-2"><i class="fa-solid fa-wand-magic-sparkles text-cyber-cyan"></i> 快速預設:</span>
+                <button onclick="applyPidPreset('stable')" class="px-3.5 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-cyber-cyan/40 text-cyber-cyan text-xs font-mono transition-all">
+                    ⚖️ 穩定響應 (Default Stable)
+                </button>
+                <button onclick="applyPidPreset('smooth')" class="px-3.5 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-300 hover:text-white text-xs font-mono transition-all">
+                    🎯 臨界阻尼無過衝 (Critically Damped)
+                </button>
+                <button onclick="applyPidPreset('aggressive')" class="px-3.5 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-yellow-500/40 text-yellow-400 text-xs font-mono transition-all">
+                    ⚡ 激進高速 (Aggressive)
+                </button>
+                <button onclick="applyPidPreset('oscillatory')" class="px-3.5 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-red-500/40 text-red-400 text-xs font-mono transition-all">
+                    🌊 欠阻尼震盪 (Underdamped)
+                </button>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                
+                <!-- Left Panel: Tuning Controls & Live Code Export -->
+                <div class="lg:col-span-5 space-y-6">
+                    
+                    <!-- Sliders & Numeric Inputs -->
+                    <div class="glass-panel p-6 rounded-2xl border border-cyber-cyan/30 space-y-5">
+                        <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                            <h3 class="font-bold text-slate-100 text-base flex items-center gap-2">
+                                <i class="fa-solid fa-sliders text-cyber-cyan"></i> PID 增益常數控制台
+                            </h3>
+                            <button onclick="runPidSimulation()" class="text-xs font-mono text-cyber-cyan hover:underline flex items-center gap-1">
+                                <i class="fa-solid fa-play"></i> 重新模擬
+                            </button>
+                        </div>
+
+                        <!-- Target Distance Slider -->
+                        <div class="space-y-1.5">
+                            <div class="flex justify-between text-xs font-mono">
+                                <label class="text-slate-300 font-semibold">目標距離 (Target Distance):</label>
+                                <span id="val-target" class="text-cyber-gold font-bold">50.0 in</span>
+                            </div>
+                            <input type="range" id="input-target" min="10" max="100" step="1" value="50" oninput="updatePidParams()" class="w-full accent-cyber-gold cursor-pointer bg-slate-900 rounded-lg h-2">
+                        </div>
+
+                        <!-- Kp Control -->
+                        <div class="space-y-1.5 pt-2 border-t border-slate-800/60">
+                            <div class="flex justify-between text-xs font-mono">
+                                <label class="text-cyber-cyan font-bold">Kp (Proportional 比例增益):</label>
+                                <input type="number" id="num-kp" min="0" max="3" step="0.01" value="0.45" onchange="updatePidFromInput('kp')" class="w-16 bg-slate-950 border border-cyber-cyan/40 rounded px-1.5 py-0.5 text-cyber-cyan text-right font-mono">
+                            </div>
+                            <input type="range" id="input-kp" min="0" max="2" step="0.01" value="0.45" oninput="updatePidParams()" class="w-full accent-cyber-cyan cursor-pointer bg-slate-900 rounded-lg h-2">
+                            <p class="text-[11px] text-slate-500 font-sans">產生與當前誤差成正比的修正力。過高會引發強烈震盪。</p>
+                        </div>
+
+                        <!-- Ki Control -->
+                        <div class="space-y-1.5 pt-2 border-t border-slate-800/60">
+                            <div class="flex justify-between text-xs font-mono">
+                                <label class="text-cyber-purple font-bold">Ki (Integral 積分增益):</label>
+                                <input type="number" id="num-ki" min="0" max="0.05" step="0.001" value="0.002" onchange="updatePidFromInput('ki')" class="w-20 bg-slate-950 border border-cyber-purple/40 rounded px-1.5 py-0.5 text-cyber-purple text-right font-mono">
+                            </div>
+                            <input type="range" id="input-ki" min="0" max="0.04" step="0.001" value="0.002" oninput="updatePidParams()" class="w-full accent-cyber-purple cursor-pointer bg-slate-900 rounded-lg h-2">
+                            <p class="text-[11px] text-slate-500 font-sans">累積歷史誤差，消除殘留穩態誤差 (Steady-State Error)。</p>
+                        </div>
+
+                        <!-- Kd Control -->
+                        <div class="space-y-1.5 pt-2 border-t border-slate-800/60">
+                            <div class="flex justify-between text-xs font-mono">
+                                <label class="text-cyber-emerald font-bold">Kd (Derivative 微分增益):</label>
+                                <input type="number" id="num-kd" min="0" max="1.5" step="0.01" value="0.15" onchange="updatePidFromInput('kd')" class="w-16 bg-slate-950 border border-cyber-emerald/40 rounded px-1.5 py-0.5 text-cyber-emerald text-right font-mono">
+                            </div>
+                            <input type="range" id="input-kd" min="0" max="1" step="0.01" value="0.15" oninput="updatePidParams()" class="w-full accent-cyber-emerald cursor-pointer bg-slate-900 rounded-lg h-2">
+                            <p class="text-[11px] text-slate-500 font-sans">預測未來誤差變化速率，提供物理阻尼抑止過沖。</p>
+                        </div>
+                    </div>
+
+                    <!-- Live Code Export Card -->
+                    <div class="glass-panel p-5 rounded-2xl border border-slate-800 space-y-3 font-mono text-xs">
+                        <div class="flex justify-between items-center">
+                            <span class="text-slate-300 font-bold flex items-center gap-1.5">
+                                <i class="fa-solid fa-code text-cyber-cyan"></i> C++ / LemLib PID Config 匯出
+                            </span>
+                            <button onclick="copyTunedPidCode()" class="px-2.5 py-1 rounded bg-cyber-cyan/20 hover:bg-cyber-cyan/30 text-cyber-cyan border border-cyber-cyan/40 text-[11px] transition-all">
+                                <i class="fa-regular fa-copy mr-1"></i> 複製 PID 代碼
+                            </button>
+                        </div>
+                        <div class="p-3 bg-slate-950 rounded-xl border border-slate-800 text-slate-300 leading-relaxed overflow-x-auto text-[11px]" id="live-pid-code-box">
+                            // Injected Constants from Benson's Tuner Suite<br/>
+                            <span class="text-cyber-purple">struct</span> <span class="text-cyber-cyan">PIDGains</span> {<br/>
+                            &nbsp;&nbsp;<span class="text-yellow-400">double</span> kP = <span id="code-kp" class="text-cyber-cyan font-bold">0.45</span>;<br/>
+                            &nbsp;&nbsp;<span class="text-yellow-400">double</span> kI = <span id="code-ki" class="text-cyber-purple font-bold">0.002</span>;<br/>
+                            &nbsp;&nbsp;<span class="text-yellow-400">double</span> kD = <span id="code-kd" class="text-cyber-emerald font-bold">0.15</span>;<br/>
+                            };<br/>
+                            <span class="text-slate-500">// LemLib Chassis Controller Setup</span><br/>
+                            lemlib::ControllerSettings drivePID(<span id="code-kp-2" class="text-cyber-cyan">0.45</span>, <span id="code-ki-2" class="text-cyber-purple">0.002</span>, <span id="code-kd-2" class="text-cyber-emerald">0.15</span>, <span class="text-cyber-emerald">3</span>, <span class="text-cyber-emerald">1</span>, <span class="text-cyber-emerald">100</span>, <span class="text-cyber-emerald">3</span>, <span class="text-cyber-emerald">500</span>, <span class="text-cyber-emerald">20</span>);
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Right Panel: Dynamic Chart & 2D Physics Preview -->
+                <div class="lg:col-span-7 space-y-6">
+                    
+                    <!-- Live Response Chart -->
+                    <div class="glass-panel p-5 rounded-2xl border border-cyber-cyan/30 space-y-3">
+                        <div class="flex justify-between items-center text-xs font-mono">
+                            <span class="text-slate-200 font-bold flex items-center gap-2">
+                                <i class="fa-solid fa-chart-line text-cyber-cyan"></i>
+                                階躍響應曲線圖 (Step Response Plot)
+                            </span>
+                            <div class="flex flex-wrap gap-3 text-[11px]">
+                                <span class="text-cyber-gold"><i class="fa-solid fa-minus"></i> Target</span>
+                                <span class="text-cyber-cyan"><i class="fa-solid fa-minus"></i> Position</span>
+                                <span class="text-red-400"><i class="fa-solid fa-minus"></i> Error</span>
+                                <span class="text-cyber-purple"><i class="fa-solid fa-minus"></i> Voltage</span>
+                            </div>
+                        </div>
+
+                        <!-- Canvas Plot -->
+                        <div class="relative w-full aspect-[16/9] rounded-xl overflow-hidden border border-slate-800 bg-slate-950">
+                            <canvas id="pid-chart-canvas" class="w-full h-full block"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- 2D Robot Motion Physics Simulation -->
+                    <div class="glass-panel p-5 rounded-2xl border border-slate-800 space-y-3">
+                        <div class="flex justify-between items-center text-xs font-mono">
+                            <span class="text-slate-200 font-bold flex items-center gap-2">
+                                <i class="fa-solid fa-robot text-cyber-purple"></i>
+                                4694A 底盤動態運動模擬 (Real-time Chassis Physics)
+                            </span>
+                            <span id="pid-physics-metrics" class="text-cyber-cyan text-[11px] font-mono">
+                                Overshoot: 0.0% | Settling: --s
+                            </span>
+                        </div>
+
+                        <!-- Canvas Physics -->
+                        <div class="relative w-full h-28 rounded-xl overflow-hidden border border-slate-800 bg-slate-950 flex items-center">
+                            <canvas id="pid-physics-canvas" class="w-full h-full block"></canvas>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+    </section>
+
     <!-- Interactive 2D Autonomous Field Strategy Visualizer -->
     <section id="strategy-simulator" class="py-16 bg-slate-950/70 border-y border-slate-800 relative">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -734,7 +893,305 @@
             showToast("已複製 Instagram 帳號: @bensonozh_1223");
         }
 
-        // 3. Filterable Event Cards
+        // --- PID TUNER ENGINE ---
+        let currentPidState = {
+            kp: 0.45,
+            ki: 0.002,
+            kd: 0.15,
+            target: 50
+        };
+
+        const pidPresets = {
+            stable: { kp: 0.45, ki: 0.002, kd: 0.15 },
+            smooth: { kp: 0.35, ki: 0.001, kd: 0.28 },
+            aggressive: { kp: 0.85, ki: 0.005, kd: 0.08 },
+            oscillatory: { kp: 1.20, ki: 0.015, kd: 0.01 }
+        };
+
+        function applyPidPreset(presetKey) {
+            if (pidPresets[presetKey]) {
+                const p = pidPresets[presetKey];
+                currentPidState.kp = p.kp;
+                currentPidState.ki = p.ki;
+                currentPidState.kd = p.kd;
+                
+                document.getElementById('input-kp').value = p.kp;
+                document.getElementById('num-kp').value = p.kp;
+                document.getElementById('input-ki').value = p.ki;
+                document.getElementById('num-ki').value = p.ki;
+                document.getElementById('input-kd').value = p.kd;
+                document.getElementById('num-kd').value = p.kd;
+
+                updatePidParams();
+                showToast(`已載入 PID 預設: ${presetKey.toUpperCase()}`);
+            }
+        }
+
+        function updatePidFromInput(param) {
+            const numEl = document.getElementById(`num-${param}`);
+            const sliderEl = document.getElementById(`input-${param}`);
+            if (numEl && sliderEl) {
+                sliderEl.value = numEl.value;
+                updatePidParams();
+            }
+        }
+
+        function updatePidParams() {
+            currentPidState.kp = parseFloat(document.getElementById('input-kp').value);
+            currentPidState.ki = parseFloat(document.getElementById('input-ki').value);
+            currentPidState.kd = parseFloat(document.getElementById('input-kd').value);
+            currentPidState.target = parseFloat(document.getElementById('input-target').value);
+
+            document.getElementById('num-kp').value = currentPidState.kp.toFixed(2);
+            document.getElementById('num-ki').value = currentPidState.ki.toFixed(3);
+            document.getElementById('num-kd').value = currentPidState.kd.toFixed(2);
+            document.getElementById('val-target').innerText = currentPidState.target.toFixed(1) + " in";
+
+            // Update C++ live exporter text
+            document.getElementById('code-kp').innerText = currentPidState.kp.toFixed(2);
+            document.getElementById('code-ki').innerText = currentPidState.ki.toFixed(3);
+            document.getElementById('code-kd').innerText = currentPidState.kd.toFixed(2);
+            document.getElementById('code-kp-2').innerText = currentPidState.kp.toFixed(2);
+            document.getElementById('code-ki-2').innerText = currentPidState.ki.toFixed(3);
+            document.getElementById('code-kd-2').innerText = currentPidState.kd.toFixed(2);
+
+            runPidSimulation();
+        }
+
+        function copyTunedPidCode() {
+            const codeText = `struct PIDGains {
+    double kP = ${currentPidState.kp.toFixed(2)};
+    double kI = ${currentPidState.ki.toFixed(3)};
+    double kD = ${currentPidState.kd.toFixed(2)};
+};
+lemlib::ControllerSettings drivePID(${currentPidState.kp.toFixed(2)}, ${currentPidState.ki.toFixed(3)}, ${currentPidState.kd.toFixed(2)}, 3, 1, 100, 3, 500, 20);`;
+            const tempInput = document.createElement('textarea');
+            tempInput.value = codeText;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempInput);
+            showToast("已複製 C++ PID 參數與 LemLib 設定！");
+        }
+
+        let pidSimData = [];
+        let physicsAnimId = null;
+
+        function runPidSimulation() {
+            // Run discrete math simulation (50Hz loop, 5.0 seconds = 250 steps)
+            const dt = 0.02;
+            const steps = 250;
+            const target = currentPidState.target;
+            const kp = currentPidState.kp;
+            const ki = currentPidState.ki;
+            const kd = currentPidState.kd;
+
+            let pos = 0;
+            let vel = 0;
+            let integral = 0;
+            let prevError = target;
+            pidSimData = [];
+
+            let maxPos = 0;
+            let settledStep = null;
+
+            for (let i = 0; i < steps; i++) {
+                const time = i * dt;
+                const error = target - pos;
+
+                // Anti-windup integral
+                if (Math.abs(error) < 20) {
+                    integral += error * dt;
+                } else {
+                    integral = 0;
+                }
+
+                const derivative = (error - prevError) / dt;
+                let voltage = (kp * error) + (ki * integral) + (kd * derivative);
+                
+                // Saturate voltage to +/- 12V max motor output
+                voltage = Math.max(-12, Math.min(12, voltage));
+
+                // Motor dynamics & chassis mass
+                const accel = (voltage * 2.8 - 0.25 * vel) / 1.0;
+                vel += accel * dt;
+                pos += vel * dt;
+
+                prevError = error;
+
+                if (pos > maxPos) maxPos = pos;
+                if (Math.abs(error) < target * 0.02 && settledStep === null && i > 10) {
+                    settledStep = i;
+                } else if (Math.abs(error) >= target * 0.02) {
+                    settledStep = null;
+                }
+
+                pidSimData.push({ time, pos, error, voltage, target });
+            }
+
+            const overshoot = Math.max(0, ((maxPos - target) / target) * 100);
+            const settlingTime = settledStep !== null ? (settledStep * dt).toFixed(2) + "s" : "N/A (Unstable/Oscillating)";
+            document.getElementById('pid-physics-metrics').innerText = `Overshoot: ${overshoot.toFixed(1)}% | Settling: ${settlingTime}`;
+
+            renderPidChart();
+            startPidPhysicsAnim();
+        }
+
+        function renderPidChart() {
+            const chartCanvas = document.getElementById('pid-chart-canvas');
+            if (!chartCanvas) return;
+            const cCtx = chartCanvas.getContext('2d');
+            chartCanvas.width = chartCanvas.clientWidth;
+            chartCanvas.height = chartCanvas.clientHeight;
+
+            const w = chartCanvas.width;
+            const h = chartCanvas.height;
+            cCtx.clearRect(0, 0, w, h);
+
+            if (pidSimData.length === 0) return;
+
+            // Grid Lines & Labels
+            cCtx.strokeStyle = '#1e293b';
+            cCtx.lineWidth = 1;
+            for (let x = 0; x < w; x += w / 5) {
+                cCtx.beginPath();
+                cCtx.moveTo(x, 0);
+                cCtx.lineTo(x, h);
+                cCtx.stroke();
+            }
+            for (let y = 0; y < h; y += h / 4) {
+                cCtx.beginPath();
+                cCtx.moveTo(0, y);
+                cCtx.lineTo(w, y);
+                cCtx.stroke();
+            }
+
+            const maxVal = Math.max(100, currentPidState.target * 1.4);
+            const mapY = (val) => h - (val / maxVal) * (h - 20) - 10;
+            const mapX = (step) => (step / pidSimData.length) * w;
+
+            // Target Line (Gold Dashed)
+            const targetY = mapY(currentPidState.target);
+            cCtx.strokeStyle = '#fbbf24';
+            cCtx.lineWidth = 2;
+            cCtx.setLineDash([6, 4]);
+            cCtx.beginPath();
+            cCtx.moveTo(0, targetY);
+            cCtx.lineTo(w, targetY);
+            cCtx.stroke();
+            cCtx.setLineDash([]);
+
+            // Plot Position Curve (Cyan)
+            cCtx.strokeStyle = '#00f3ff';
+            cCtx.lineWidth = 3;
+            cCtx.beginPath();
+            cCtx.moveTo(mapX(0), mapY(pidSimData[0].pos));
+            for (let i = 1; i < pidSimData.length; i++) {
+                cCtx.lineTo(mapX(i), mapY(pidSimData[i].pos));
+            }
+            cCtx.stroke();
+
+            // Plot Error Curve (Red)
+            cCtx.strokeStyle = '#f87171';
+            cCtx.lineWidth = 1.5;
+            cCtx.beginPath();
+            cCtx.moveTo(mapX(0), mapY(pidSimData[0].error));
+            for (let i = 1; i < pidSimData.length; i++) {
+                cCtx.lineTo(mapX(i), mapY(pidSimData[i].error));
+            }
+            cCtx.stroke();
+
+            // Plot Voltage Curve (Purple - scaled)
+            cCtx.strokeStyle = '#c084fc';
+            cCtx.lineWidth = 1.5;
+            cCtx.beginPath();
+            cCtx.moveTo(mapX(0), mapY(pidSimData[0].voltage * (currentPidState.target / 12)));
+            for (let i = 1; i < pidSimData.length; i++) {
+                cCtx.lineTo(mapX(i), mapY(pidSimData[i].voltage * (currentPidState.target / 12)));
+            }
+            cCtx.stroke();
+        }
+
+        let physProgress = 0;
+        function startPidPhysicsAnim() {
+            if (physicsAnimId) cancelAnimationFrame(physicsAnimId);
+            physProgress = 0;
+
+            const pCanvas = document.getElementById('pid-physics-canvas');
+            if (!pCanvas) return;
+            const pCtx = pCanvas.getContext('2d');
+
+            function anim() {
+                pCanvas.width = pCanvas.clientWidth;
+                pCanvas.height = pCanvas.clientHeight;
+                const pw = pCanvas.width;
+                const ph = pCanvas.height;
+
+                pCtx.clearRect(0, 0, pw, ph);
+
+                // Track Line & Start/End Flags
+                pCtx.strokeStyle = '#334155';
+                pCtx.lineWidth = 4;
+                pCtx.beginPath();
+                pCtx.moveTo(40, ph / 2);
+                pCtx.lineTo(pw - 40, ph / 2);
+                pCtx.stroke();
+
+                // Target Line
+                const targetX = 40 + ((pw - 80) * 0.85);
+                pCtx.strokeStyle = '#fbbf24';
+                pCtx.lineWidth = 3;
+                pCtx.setLineDash([4, 4]);
+                pCtx.beginPath();
+                pCtx.moveTo(targetX, 10);
+                pCtx.lineTo(targetX, ph - 10);
+                pCtx.stroke();
+                pCtx.setLineDash([]);
+
+                pCtx.fillStyle = '#fbbf24';
+                pCtx.font = '10px JetBrains Mono';
+                pCtx.fillText("TARGET", targetX - 18, 20);
+
+                // Current Simulated Robot Position
+                const dataIndex = Math.min(Math.floor(physProgress), pidSimData.length - 1);
+                const curPos = pidSimData[dataIndex] ? pidSimData[dataIndex].pos : 0;
+                const normPos = curPos / currentPidState.target;
+
+                const robotX = 40 + (targetX - 40) * normPos;
+
+                // Draw VEX 4694A Robot Box
+                pCtx.fillStyle = '#0f172a';
+                pCtx.strokeStyle = '#00f3ff';
+                pCtx.lineWidth = 2;
+                pCtx.fillRect(robotX - 18, ph / 2 - 18, 36, 36);
+                pCtx.strokeRect(robotX - 18, ph / 2 - 18, 36, 36);
+
+                pCtx.fillStyle = '#00f3ff';
+                pCtx.font = '9px JetBrains Mono';
+                pCtx.fillText("4694A", robotX - 14, ph / 2 + 3);
+
+                physProgress += 1.2;
+                if (physProgress < pidSimData.length) {
+                    physicsAnimId = requestAnimationFrame(anim);
+                } else {
+                    physProgress = pidSimData.length - 1;
+                }
+            }
+            anim();
+        }
+
+        // Initialize Tuner & Strategy Canvas on load
+        window.addEventListener('DOMContentLoaded', () => {
+            updatePidParams();
+            drawRobotPath('red', 0);
+        });
+
+        // Window resize re-render
+        window.addEventListener('resize', () => {
+            renderPidChart();
+        });
+
+        // Filterable Event Cards
         const filterBtns = document.querySelectorAll('.filter-btn');
         const eventItems = document.querySelectorAll('.event-item');
 
